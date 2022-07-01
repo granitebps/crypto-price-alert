@@ -34,3 +34,8 @@ Should be array of this data
 
 ## Notes
 - Please run `go build main.go` every time you changes `alert.json` file
+
+## TODO
+- [ ] Add coingecko as price vendor
+- [ ] Create `tickers.json` to save supported ticker. Create `{ticker}.json` file to save email for every ticker
+- [ ] Explore another way to send alert
