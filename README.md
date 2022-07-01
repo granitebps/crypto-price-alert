@@ -28,6 +28,6 @@ Should be array of this data
   "ticker": "HNST",
   "pair": "hnstidr",
   "price": 130,
-  "EmailedAt": null
+  "emailed_at": null
  }
 ```
