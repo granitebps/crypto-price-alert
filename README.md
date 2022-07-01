@@ -31,3 +31,6 @@ Should be array of this data
   "emailed_at": null
  }
 ```
+
+## Notes
+- Please run `go build main.go` every time you changes `alert.json` file
