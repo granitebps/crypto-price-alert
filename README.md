@@ -21,8 +21,8 @@ This app will send you alert if crypto hit a price that you want once a day. Usi
 ### JSON file
 
 #### Structure
-Should be array of this data
 ```json
+[
  {
   "email": "example@example.com",
   "ticker": "HNST",
@@ -30,6 +30,7 @@ Should be array of this data
   "price": 130,
   "emailed_at": null
  }
+]
 ```
 
 ## Notes
