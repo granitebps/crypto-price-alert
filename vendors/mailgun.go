@@ -22,7 +22,7 @@ func SendEmail(alert types.Alert, price int) error {
 
 		message := mg.NewMessage(sender, subject, body, alert.Email)
 
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)
 		defer cancel()
 
 		// Send the message with a 10 second timeout
