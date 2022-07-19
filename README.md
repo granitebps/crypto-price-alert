@@ -6,13 +6,15 @@ This app will send you alert if crypto hit a price that you want once a day. Usi
 - Clone this repo
 - Copy `.env.example` to `.env`
 - Create `alert.json` and fill the file with array of data below
+- Create `alias.json` and fill the file with object of data below. This must be filled if you're not using default price vendor and `pair` value is different than default price vendor `pair` value
 - Build the application with `go build main.go`
 - Run the app using cron
 
 ## Config
 
 ### Price vendor
-- [Indodax](https://github.com/btcid/indodax-official-api-docs/blob/master/Public-RestAPI.md#ticker)
+- [Indodax](https://github.com/btcid/indodax-official-api-docs/blob/master/Public-RestAPI.md#ticker) (Default)
+- [CoinGecko](https://www.coingecko.com/en/api/documentation)
 
 ### Mail vendor
 - [Mailgun](https://www.mailgun.com)
@@ -20,7 +22,7 @@ This app will send you alert if crypto hit a price that you want once a day. Usi
 
 ### JSON file
 
-#### Structure
+#### `alert.json` Structure
 ```json
 [
  {
@@ -33,11 +35,25 @@ This app will send you alert if crypto hit a price that you want once a day. Usi
 ]
 ```
 
+#### `alias.json` Structure
+```json
+{
+  "coingecko": {
+    "hnstidr": "honest-mining"
+  }
+}
+```
+
 ## Notes
 - Please run `go build main.go` every time you changes `alert.json` file
 
 ## TODO
-- [ ] Add coingecko as price vendor
-- [ ] Create `tickers.json` to save supported ticker. Create `{ticker}.json` file to save email for every ticker
+- [x] Add coingecko as price vendor
+- [ ] Create `tickers.json` to save supported ticker.
+- [ ] Create `{ticker}.json` file to save email for every ticker
 - [ ] Explore another way to send alert
 - [ ] Add alert when price above/below price
+- [ ] Add testing
+- [ ] Add multiple currency
+- [ ] Setup database
+- [ ] Add sendgrid as mail vendor
