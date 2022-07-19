@@ -34,6 +34,14 @@ func ParseAlertData(jsonData []byte, data []types.Alert) ([]types.Alert, error) 
 	return data, nil
 }
 
+func ParseAliasData(jsonData []byte, data types.Alias) (types.Alias, error) {
+	if err := json.Unmarshal(jsonData, &data); err != nil {
+		return data, err
+	}
+
+	return data, nil
+}
+
 func DateEqual(date1, date2 time.Time) bool {
 	y1, m1, d1 := date1.Date()
 	y2, m2, d2 := date2.Date()

@@ -10,4 +10,8 @@ type Alert struct {
 	EmailedAt time.Time `json:"emailed_at"`
 }
 
+type Alias map[string]map[string]string
+
 type IndodaxResponse map[string]map[string]interface{}
+
+type CoingeckoResponse map[string]map[string]float64

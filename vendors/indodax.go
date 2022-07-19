@@ -9,8 +9,8 @@ import (
 	"github.com/granitebps/crypto-price-alert/types"
 )
 
-func GetPrice(alert types.Alert) (int, error) {
-	var data map[string]map[string]interface{}
+func GetPriceIndodax(alert types.Alert) (int, error) {
+	var data types.IndodaxResponse
 	request, err := http.NewRequest(http.MethodGet, fmt.Sprintf("https://indodax.com/api/ticker/%s", alert.Pair), nil)
 	if err != nil {
 		return 0, err

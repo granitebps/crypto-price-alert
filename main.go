@@ -52,7 +52,12 @@ func main() {
 
 	for i, alert := range result {
 		if vendor == "indodax" {
-			lastPrice, err = vendors.GetPrice(alert)
+			lastPrice, err = vendors.GetPriceIndodax(alert)
+			if err != nil {
+				log.Panic(err)
+			}
+		} else if vendor == "coingecko" {
+			lastPrice, err = vendors.GetPriceCoingecko(alert)
 			if err != nil {
 				log.Panic(err)
 			}
