@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
+	"github.com/getsentry/sentry-go"
 	"github.com/granitebps/crypto-price-alert/helper"
 	"github.com/granitebps/crypto-price-alert/types"
 	"github.com/granitebps/crypto-price-alert/vendors"
@@ -19,6 +21,20 @@ func main() {
 	}
 	vendor := os.Getenv("PRICE_VENDOR")
 	mail := os.Getenv("MAIL_VENDOR")
+	sentryDsn := os.Getenv("SENTRY_DSN")
+	appEnv := os.Getenv("APP_ENV")
+	appDebug, _ := strconv.ParseBool(os.Getenv("APP_DEBUG"))
+
+	err = sentry.Init(sentry.ClientOptions{
+		Dsn:         sentryDsn,
+		Debug:       appDebug,
+		Environment: appEnv,
+	})
+	if err != nil {
+		log.Fatalf("sentry.Init: %s", err)
+	}
+	defer sentry.Flush(2 * time.Second)
+	defer sentry.Recover()
 
 	var alerts []types.Alert
 	var lastPrice int
@@ -26,22 +42,22 @@ func main() {
 	filename := "alert.json"
 	jsonData, err := helper.ReadJsonFile(filename)
 	if err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
 
 	result, err := helper.ParseAlertData(jsonData, alerts)
 	if err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
 
 	for i, alert := range result {
 		if vendor == "indodax" {
 			lastPrice, err = vendors.GetPrice(alert)
 			if err != nil {
-				log.Fatal(err)
+				log.Panic(err)
 			}
 		} else {
-			log.Fatal("Price vendor not available!")
+			log.Panic("Price vendor not available!")
 		}
 
 		now := time.Now().Format(time.RFC1123)
@@ -52,10 +68,10 @@ func main() {
 				if mail == "mailgun" {
 					err := vendors.SendEmail(alert, lastPrice)
 					if err != nil {
-						log.Fatal(err)
+						log.Panic(err)
 					}
 				} else {
-					log.Fatal("Mail vendor not available!")
+					log.Panic("Mail vendor not available!")
 				}
 			}
 		}

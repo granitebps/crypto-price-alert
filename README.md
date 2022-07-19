@@ -40,3 +40,4 @@ This app will send you alert if crypto hit a price that you want once a day. Usi
 - [ ] Add coingecko as price vendor
 - [ ] Create `tickers.json` to save supported ticker. Create `{ticker}.json` file to save email for every ticker
 - [ ] Explore another way to send alert
+- [ ] Add alert when price above/below price
