@@ -50,7 +50,7 @@ func main() {
 		log.Panic(err)
 	}
 
-	for i, alert := range result {
+	for _, alert := range result {
 		if vendor == "indodax" {
 			lastPrice, err = vendors.GetPriceIndodax(alert)
 			if err != nil {
@@ -69,7 +69,7 @@ func main() {
 		fmt.Printf("Price for %s at %s is : %d\n", alert.Pair, now, lastPrice)
 
 		if lastPrice >= int(alert.Price) {
-			if !helper.DateEqual(time.Now(), alert.EmailedAt) || alert.EmailedAt.IsZero() {
+			if alert.Enabled {
 				if mail == "mailgun" {
 					err := vendors.SendEmail(alert, lastPrice)
 					if err != nil {
@@ -80,8 +80,5 @@ func main() {
 				}
 			}
 		}
-
-		result[i].EmailedAt = time.Now()
 	}
-	helper.UpdateFile(result)
 }

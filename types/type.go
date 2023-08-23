@@ -1,13 +1,11 @@
 package types
 
-import "time"
-
 type Alert struct {
-	Email     string    `json:"email"`
-	Ticker    string    `json:"ticker"`
-	Pair      string    `json:"pair"`
-	Price     uint      `json:"price"`
-	EmailedAt time.Time `json:"emailed_at"`
+	Email   string `json:"email"`
+	Ticker  string `json:"ticker"`
+	Pair    string `json:"pair"`
+	Price   uint   `json:"price"`
+	Enabled bool   `json:"enabled"`
 }
 
 type Alias map[string]map[string]string

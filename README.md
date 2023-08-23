@@ -1,10 +1,11 @@
 # Crypto Price Alert
 
-This app will send you alert if crypto hit a price that you want once a day. Using JSON file to determine which crypto you want to watch, what price that you want to watch, what email that you want to receive the email.
+This app will send you alert if crypto hit a price that you want. Using JSON file to determine which crypto you want to watch, what price that you want to watch, what email that you want to receive the email.
 
 ## How To
 - Clone this repo
 - Copy `.env.example` to `.env`
+- Fill `.env` file with you own credentials
 - Create `alert.json` and fill the file with array of data below
 - Create `alias.json` and fill the file with object of data below. This must be filled if you're not using default price vendor and `pair` value is different than default price vendor `pair` value
 - Build the application with `go build main.go`
@@ -30,7 +31,7 @@ This app will send you alert if crypto hit a price that you want once a day. Usi
   "ticker": "HNST",
   "pair": "hnstidr",
   "price": 130,
-  "emailed_at": null
+  "enabled": true
  }
 ]
 ```
