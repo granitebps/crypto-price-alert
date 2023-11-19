@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/getsentry/sentry-go"
+	"github.com/go-co-op/gocron"
 	"github.com/granitebps/crypto-price-alert/helper"
 	"github.com/granitebps/crypto-price-alert/types"
 	"github.com/granitebps/crypto-price-alert/vendors"
@@ -33,52 +34,56 @@ func main() {
 	if err != nil {
 		log.Fatalf("sentry.Init: %s", err)
 	}
-	defer sentry.Flush(2 * time.Second)
-	defer sentry.Recover()
 
-	var alerts []types.Alert
-	var lastPrice int
+	s := gocron.NewScheduler(time.UTC)
 
-	filename := "alert.json"
-	jsonData, err := helper.ReadJsonFile(filename)
-	if err != nil {
-		log.Panic(err)
-	}
+	s.Every(1).Hour().Do(func() {
+		var alerts []types.Alert
+		var lastPrice int
 
-	result, err := helper.ParseAlertData(jsonData, alerts)
-	if err != nil {
-		log.Panic(err)
-	}
-
-	for _, alert := range result {
-		if vendor == "indodax" {
-			lastPrice, err = vendors.GetPriceIndodax(alert)
-			if err != nil {
-				log.Panic(err)
-			}
-		} else if vendor == "coingecko" {
-			lastPrice, err = vendors.GetPriceCoingecko(alert)
-			if err != nil {
-				log.Panic(err)
-			}
-		} else {
-			log.Panic("Price vendor not available!")
+		filename := "alert.json"
+		jsonData, err := helper.ReadJsonFile(filename)
+		if err != nil {
+			log.Panic(err)
 		}
 
-		now := time.Now().Format(time.RFC1123)
-		fmt.Printf("Price for %s at %s is : %d\n", alert.Pair, now, lastPrice)
+		result, err := helper.ParseAlertData(jsonData, alerts)
+		if err != nil {
+			log.Panic(err)
+		}
 
-		if lastPrice >= int(alert.Price) {
-			if alert.Enabled {
-				if mail == "mailgun" {
-					err := vendors.SendEmail(alert, lastPrice)
-					if err != nil {
-						log.Panic(err)
+		for _, alert := range result {
+			if vendor == "indodax" {
+				lastPrice, err = vendors.GetPriceIndodax(alert)
+				if err != nil {
+					log.Panic(err)
+				}
+			} else if vendor == "coingecko" {
+				lastPrice, err = vendors.GetPriceCoingecko(alert)
+				if err != nil {
+					log.Panic(err)
+				}
+			} else {
+				log.Panic("Price vendor not available!")
+			}
+
+			now := time.Now().Format(time.RFC1123)
+			fmt.Printf("Price for %s at %s is : %d\n", alert.Pair, now, lastPrice)
+
+			if lastPrice >= int(alert.Price) {
+				if alert.Enabled {
+					if mail == "mailgun" {
+						err := vendors.SendEmail(alert, lastPrice)
+						if err != nil {
+							log.Panic(err)
+						}
+					} else {
+						log.Panic("Mail vendor not available!")
 					}
-				} else {
-					log.Panic("Mail vendor not available!")
 				}
 			}
 		}
-	}
+	})
+
+	s.StartBlocking()
 }
