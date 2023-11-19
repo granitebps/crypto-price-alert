@@ -1,8 +1,10 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"strconv"
 	"time"
@@ -37,6 +39,28 @@ func main() {
 
 	s := gocron.NewScheduler(time.UTC)
 
+	s.Every(1).Minute().Do(func() {
+		// Healthcheck
+		apiUrl := os.Getenv("HEALTHCHECK_URL")
+		request, err := http.NewRequest("GET", apiUrl, nil)
+		if err != nil {
+			log.Println(err)
+			sentry.CaptureException(err)
+			return
+		}
+
+		client := &http.Client{}
+		response, err := client.Do(request)
+
+		if err != nil {
+			log.Println(err)
+			sentry.CaptureException(err)
+			return
+		}
+
+		defer response.Body.Close()
+	})
+
 	s.Every(1).Hour().Do(func() {
 		var alerts []types.Alert
 		var lastPrice int
@@ -44,27 +68,38 @@ func main() {
 		filename := "alert.json"
 		jsonData, err := helper.ReadJsonFile(filename)
 		if err != nil {
-			log.Panic(err)
+			log.Println(err)
+			sentry.CaptureException(err)
+			return
 		}
 
 		result, err := helper.ParseAlertData(jsonData, alerts)
 		if err != nil {
-			log.Panic(err)
+			log.Println(err)
+			sentry.CaptureException(err)
+			return
 		}
 
 		for _, alert := range result {
 			if vendor == "indodax" {
 				lastPrice, err = vendors.GetPriceIndodax(alert)
 				if err != nil {
-					log.Panic(err)
+					log.Println(err)
+					sentry.CaptureException(err)
+					continue
 				}
 			} else if vendor == "coingecko" {
 				lastPrice, err = vendors.GetPriceCoingecko(alert)
 				if err != nil {
-					log.Panic(err)
+					log.Println(err)
+					sentry.CaptureException(err)
+					continue
 				}
 			} else {
-				log.Panic("Price vendor not available!")
+				err := errors.New("price vendor not available")
+				log.Println(err)
+				sentry.CaptureException(err)
+				continue
 			}
 
 			now := time.Now().Format(time.RFC1123)
@@ -75,10 +110,15 @@ func main() {
 					if mail == "mailgun" {
 						err := vendors.SendEmail(alert, lastPrice)
 						if err != nil {
-							log.Panic(err)
+							log.Println(err)
+							sentry.CaptureException(err)
+							continue
+						} else {
+							err := errors.New("mail vendor not available")
+							log.Println(err)
+							sentry.CaptureException(err)
+							continue
 						}
-					} else {
-						log.Panic("Mail vendor not available!")
 					}
 				}
 			}
