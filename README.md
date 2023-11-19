@@ -9,7 +9,7 @@ This app will send you alert if crypto hit a price that you want. Using JSON fil
 - Create `alert.json` and fill the file with array of data below
 - Create `alias.json` and fill the file with object of data below. This must be filled if you're not using default price vendor and `pair` value is different than default price vendor `pair` value
 - Build the application with `go build main.go`
-- Run the app using cron
+- This app already build with scheduler, so you just need to adjust the time.
 
 ## Config
 
