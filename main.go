@@ -11,6 +11,7 @@ import (
 
 	"github.com/getsentry/sentry-go"
 	"github.com/go-co-op/gocron"
+	"github.com/gofiber/fiber/v2"
 	"github.com/granitebps/crypto-price-alert/helper"
 	"github.com/granitebps/crypto-price-alert/types"
 	"github.com/granitebps/crypto-price-alert/vendors"
@@ -36,6 +37,14 @@ func main() {
 	if err != nil {
 		log.Fatalf("sentry.Init: %s", err)
 	}
+
+	app := fiber.New()
+	app.Get("", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{
+			"success": true,
+			"message": "Success",
+		})
+	})
 
 	s := gocron.NewScheduler(time.UTC)
 
@@ -113,17 +122,19 @@ func main() {
 							log.Println(err)
 							sentry.CaptureException(err)
 							continue
-						} else {
-							err := errors.New("mail vendor not available")
-							log.Println(err)
-							sentry.CaptureException(err)
-							continue
 						}
+					} else {
+						err := errors.New("mail vendor not available")
+						log.Println(err)
+						sentry.CaptureException(err)
+						continue
 					}
 				}
 			}
 		}
 	})
 
-	s.StartBlocking()
+	s.StartAsync()
+
+	log.Fatal(app.Listen(":8000"))
 }

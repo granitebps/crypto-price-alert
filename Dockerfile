@@ -15,6 +15,7 @@ WORKDIR /dist
 
 RUN cp /build/main .
 RUN cp /build/.env .
+RUN cp /build/supervisord.conf .
 RUN cp /build/alias.json .
 RUN cp /build/alert.json .
 
@@ -28,10 +29,14 @@ COPY --from=build /usr/share/zoneinfo /usr/share/zoneinfo
 COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=build /dist/main .
 COPY --from=build /build/.env .
+COPY --from=build /build/supervisord.conf /etc
 COPY --from=build /build/alias.json .
 COPY --from=build /build/alert.json .
 
+EXPOSE 8000 9001
 
 ENV TZ Asia/Jakarta
 
-CMD ["./main"]
+COPY --from=ochinchina/supervisord:latest /usr/local/bin/supervisord /usr/local/bin/supervisord
+
+CMD ["/usr/local/bin/supervisord"]
